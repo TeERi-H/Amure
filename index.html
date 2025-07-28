@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amure - フランス エレガンス</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Great+Vibes&family=Allura&family=Alex+Brush&family=Kaushan+Script&family=Satisfy&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Beautiful script font for brand text */
+        .font-cursive {
+            font-family: 'Alex Brush', 'Kaushan Script', 'Great Vibes', 'Allura', 'Satisfy', cursive !important;
+            font-weight: 400;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'cursive': ['Alex Brush', 'Kaushan Script', 'Great Vibes', 'Allura', 'Satisfy', 'cursive'],
+                        'sans': ['Inter', 'sans-serif']
+                    },
+                    colors: {
+                        'gold': '#D4AF37',
+                        'gold-light': '#E8C547',
+                        'cream': '#FEFCF8',
+                        'french-gray': '#F8F6F4'
+                    },
+                    textShadow: {
+                        'gold': '2px 2px 4px rgba(212, 175, 55, 0.3)',
+                        'soft': '1px 1px 2px rgba(0, 0, 0, 0.1)'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-white font-sans">
+    <!-- Login/Signup Modal -->
+    <div id="authModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center space-x-3">
+                    <h3 class="text-2xl font-cursive text-gold font-normal tracking-wide">Amure</h3>
+                    <span class="text-gray-400 hover:text-gold transition-colors">|</span>
+                    <h3 id="modalTitle" class="text-xl font-medium text-gray-800">Login</h3>
+                </div>
+                <button id="closeModal" class="text-gray-500 hover:text-gray-700 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 text-sm font-medium mb-2">メールアドレス</label>
+                    <input type="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-medium mb-2">パスワード</label>
+                    <input type="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent" required>
+                </div>
+                <button type="submit" class="w-full bg-gold text-white py-2 rounded-lg hover:bg-yellow-600 transition-colors">
+                    ログイン
+                </button>
+                <p class="text-center text-sm text-gray-600">
+                    アカウントをお持ちでない方は 
+                    <button type="button" id="showSignup" class="text-gold hover:underline">新規登録</button>
+                </p>
+            </form>
+            
+            <!-- Signup Form -->
+            <form id="signupForm" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-gray-700 text-sm font-medium mb-2">お名前</label>
+                    <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-medium mb-2">メールアドレス</label>
+                    <input type="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-medium mb-2">パスワード</label>
+                    <input type="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent" required>
+                </div>
+                <div>
+                    <label class="block text-gray-700 text-sm font-medium mb-2">パスワード確認</label>
+                    <input type="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent" required>
+                </div>
+                <button type="submit" class="w-full bg-gold text-white py-2 rounded-lg hover:bg-yellow-600 transition-colors">
+                    新規登録
+                </button>
+                <p class="text-center text-sm text-gray-600">
+                    既にアカウントをお持ちの方は 
+                    <button type="button" id="showLogin" class="text-gold hover:underline">ログイン</button>
+                </p>
+            </form>
+        </div>
+    </div>
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-100 fixed top-0 w-full z-50">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-4xl font-cursive text-gold font-normal tracking-wide transform -rotate-2 drop-shadow-sm  -light   ">Amure</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#" class="text-gray-700 hover:text-gold px-3 py-2 text-sm font-medium transition-colors">Home</a>
+                        <a href="#products" class="text-gray-700 hover:text-gold px-3 py-2 text-sm font-medium transition-colors">Collection</a>
+                        <a href="#about" class="text-gray-700 hover:text-gold px-3 py-2 text-sm font-medium transition-colors">About</a>
+                        <a href="#contact" class="text-gray-700 hover:text-gold px-3 py-2 text-sm font-medium transition-colors">Contact</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="loginBtn" class="text-gray-700 hover:text-gold hover:border-gold px-4 py-2 border border-gray-300 rounded-full font-medium transition-colors">
+                        Login
+                    </button>
+                    <button class="text-gray-700 hover:text-gold transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m-.4-2H3m4 18a2 2 0 100-4 2 2 0 000 4zm10 0a2 2 0 100-4 2 2 0 000 4z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-b from-cream to-white pt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+            <div class="text-center">
+                <h2 class="text-8xl md:text-9xl font-cursive text-gold mb-6 tracking-wide drop-shadow-lg transform -rotate-1 font-normal    ">Amure</h2>
+                <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
+                    フランスのライフスタイルにインスパイアされた、上質なアクセサリーの限定コレクションをご覧ください
+                </p>
+                <button class="bg-gold text-white px-8 py-3 rounded-full font-medium hover:bg-yellow-600 transition-colors transform hover:scale-105 duration-200">
+                    コレクションを見る
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-center">
+                <div class="bg-french-gray rounded-lg h-96 w-full max-w-2xl relative overflow-hidden">
+                    <div id="slideshow" class="w-full h-full relative">
+                        <div class="slide absolute inset-0 opacity-100 transition-opacity duration-1000 ease-in-out">
+                            <video class="w-full h-full object-cover" autoplay muted loop>
+                                <source src="./動画スライド.mp4" type="video/mp4">
+                            </video>
+                        </div>
+                        <div class="slide absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out">
+                            <img src="./スライド.jpg" alt="アトリエ画像1" class="w-full h-full object-cover">
+                        </div>
+                        <div class="slide absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out">
+                            <img src="./スライド (2).jpg" alt="アトリエ画像2" class="w-full h-full object-cover">
+                        </div>
+                        <div class="slide absolute inset-0 opacity-0 transition-opacity duration-1000 ease-in-out">
+                            <img src="./スライド(3).jpg" alt="アトリエ画像3" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section id="products" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h3 class="text-5xl font-cursive text-gold mb-4 tracking-wide transform   ">ITEM</h3>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Product 1 -->
+                <div class="group ">
+                    <div class="bg-french-gray rounded-lg overflow-hidden mb-4 h-80">
+                        <img src="./商品画像①.jpg" alt="ボタニカルキャンドル" class="w-full h-full object-cover">
+                    </div>
+                    <h4 class="text-lg font-medium text-gray-900 mb-2">ボタニカルキャンドル</h4>
+                    <p class="text-gray-600 text-sm mb-2">ナチュラルソイワックス</p>
+                    <p class="text-gold font-semibold">¥6,500</p>
+                </div>
+
+                <!-- Product 2 -->
+                <div class="group ">
+                    <div class="bg-french-gray rounded-lg overflow-hidden mb-4 h-80">
+                        <img src="./商品画像②.jpg" alt="アロマディフューザー" class="w-full h-full object-cover">
+                    </div>
+                    <h4 class="text-lg font-medium text-gray-900 mb-2">アロマディフューザー</h4>
+                    <p class="text-gray-600 text-sm mb-2">リードスティック付き ラベンダーの香り</p>
+                    <p class="text-gold font-semibold">¥4,800</p>
+                </div>
+
+                <!-- Product 3 -->
+                <div class="group ">
+                    <div class="bg-french-gray rounded-lg overflow-hidden mb-4 h-80">
+                        <img src="./商品画像③.jpg" alt="カーアロマクリップ" class="w-full h-full object-cover">
+                    </div>
+                    <h4 class="text-lg font-medium text-gray-900 mb-2">カーアロマクリップ</h4>
+                    <p class="text-gray-600 text-sm mb-2">車用アロマ シトラスの香り</p>
+                    <p class="text-gold font-semibold">¥3,200</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-cream">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h3 class="text-4xl font-cursive text-gold mb-4">お問い合わせ</h3>
+                <p class="text-gray-600 max-w-2xl mx-auto">私たちのチームがあなたをサポートいたします</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-6">
+                    <div>
+                        <h4 class="text-lg font-medium text-gray-900 mb-2">お問い合わせ情報</h4>
+                        <div class="space-y-2 text-gray-600">
+                            <p>📧 contact@amure.fr</p>
+                            <p>📞 +33 (0)1 42 86 12 34</p>
+                            <p>📍 25 Rue Saint-Honoré, 75001 Paris</p>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-lg font-medium text-gray-900 mb-2">営業時間</h4>
+                        <div class="space-y-1 text-gray-600">
+                            <p>月曜日 - 土曜日：10:00 - 19:00</p>
+                            <p>日曜日：14:00 - 18:00</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <form class="space-y-4">
+                        <div>
+                            <input type="text" placeholder="お名前" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent">
+                        </div>
+                        <div>
+                            <input type="email" placeholder="メールアドレス" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent">
+                        </div>
+                        <div>
+                            <textarea placeholder="メッセージ" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent"></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-gold text-white py-2 rounded-lg hover:bg-yellow-600 transition-colors">
+                            メッセージを送信
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h5 class="text-3xl font-cursive text-gold mb-4 font-normal tracking-wide">Amure</h5>
+                    <p class="text-gray-400 text-sm">手の届くフランスエレガンス</p>
+                </div>
+                
+                <div>
+                    <h6 class="font-medium mb-4">ナビゲーション</h6>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class=" ">ホーム</a></li>
+                        <li><a href="#products" class=" ">コレクション</a></li>
+                        <li><a href="#about" class=" ">私たちについて</a></li>
+                        <li><a href="#contact" class=" ">お問い合わせ</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h6 class="font-medium mb-4">カスタマーサービス</h6>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class=" ">配送について</a></li>
+                        <li><a href="#" class=" ">返品について</a></li>
+                        <li><a href="#" class=" ">保証について</a></li>
+                        <li><a href="#" class=" ">よくある質問</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h6 class="font-medium mb-4">フォローする</h6>
+                    <div class="flex space-x-4">
+                        <a href="https://www.instagram.com/_____candle.108?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" class="text-gray-400  ">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="text-gray-400  ">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+                <p class="text-gray-400 text-sm">&copy; 2024 Amure. 全著作権所有。</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Login Modal Functionality
+        const loginBtn = document.getElementById('loginBtn');
+        const authModal = document.getElementById('authModal');
+        const closeModal = document.getElementById('closeModal');
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const showSignup = document.getElementById('showSignup');
+        const showLogin = document.getElementById('showLogin');
+        const modalTitle = document.getElementById('modalTitle');
+
+        // Open modal
+        loginBtn.addEventListener('click', () => {
+            authModal.classList.remove('hidden');
+        });
+
+        // Close modal
+        closeModal.addEventListener('click', () => {
+            authModal.classList.add('hidden');
+        });
+
+        // Close modal on backdrop click
+        authModal.addEventListener('click', (e) => {
+            if (e.target === authModal) {
+                authModal.classList.add('hidden');
+            }
+        });
+
+        // Switch to signup form
+        showSignup.addEventListener('click', () => {
+            loginForm.classList.add('hidden');
+            signupForm.classList.remove('hidden');
+            modalTitle.textContent = '新規登録';
+        });
+
+        // Switch to login form
+        showLogin.addEventListener('click', () => {
+            signupForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+            modalTitle.textContent = 'Login';
+        });
+
+        // Handle form submissions (demo)
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('ログイン機能は開発中です');
+        });
+
+        signupForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('新規登録機能は開発中です');
+        });
+
+        // Slideshow functionality
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        function showNextSlide() {
+            // Hide current slide
+            slides[currentSlide].style.opacity = '0';
+            
+            // Move to next slide
+            currentSlide = (currentSlide + 1) % slides.length;
+            
+            // Show next slide
+            slides[currentSlide].style.opacity = '1';
+            
+            // Set next interval based on current slide
+            const nextInterval = currentSlide === 0 ? 9000 : 4000; // 9 seconds for video, 4 seconds for images
+            setTimeout(showNextSlide, nextInterval);
+        }
+
+        // Start slideshow - video shows for 9 seconds first
+        setTimeout(showNextSlide, 9000);
+    </script>
+</body>
+</html>
