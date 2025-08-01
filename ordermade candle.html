@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ご注文 - Amure</title>
+    
+    <!-- Meta Description -->
+    <meta name="description" content="香りの幸せをあなたに">
+    
+    <!-- OGP Settings -->
+    <meta property="og:title" content="ご注文 - Amure オーダーメイドボタニカルキャンドル">
+    <meta property="og:description" content="香りの幸せをあなたに">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://teeeri-h.github.io/Amure/order.html">
+    <meta property="og:image" content="https://teeeri-h.github.io/Amure/product-image.jpg">
+    <meta property="og:site_name" content="Amure">
+    <meta property="og:locale" content="ja_JP">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ご注文 - Amure オーダーメイドボタニカルキャンドル">
+    <meta name="twitter:description" content="香りの幸せをあなたに">
+    <meta name="twitter:image" content="https://teeeri-h.github.io/Amure/product-image.jpg">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="./amure-logo.jpg">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- EmailJS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Great+Vibes&family=Allura&family=Alex+Brush&family=Kaushan+Script&family=Satisfy&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Beautiful script font for brand text */
+        .font-cursive {
+            font-family: 'Alex Brush', 'Kaushan Script', 'Great Vibes', 'Allura', 'Satisfy', cursive !important;
+            font-weight: 400;
+        }
+        
+        /* Subtle script font for section titles */
+        .font-cursive-subtle {
+            font-family: 'Dancing Script', 'Satisfy', 'cursive' !important;
+            font-weight: 500;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'cursive': ['Alex Brush', 'Kaushan Script', 'Great Vibes', 'Allura', 'Satisfy', 'cursive'],
+                        'sans': ['Inter', 'sans-serif']
+                    },
+                    colors: {
+                        'gold': '#D4AF37',
+                        'gold-light': '#E8C547',
+                        'cream': '#FEFCF8',
+                        'french-gray': '#F8F6F4'
+                    },
+                    textShadow: {
+                        'gold': '2px 2px 4px rgba(212, 175, 55, 0.3)',
+                        'soft': '1px 1px 2px rgba(0, 0, 0, 0.1)'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-white font-sans">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-100 fixed top-0 w-full z-50">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Left side: Logo -->
+                <div class="flex items-center">
+                    <a href="index.html">
+                        <h1 class="text-4xl font-cursive text-gold font-normal tracking-wide transform -rotate-2 drop-shadow-sm">Amure</h1>
+                    </a>
+                </div>
+                
+                <!-- Right side: Back button -->
+                <div class="flex items-center">
+                    <a href="index.html" class="text-gray-700 hover:text-gold px-4 py-2 border border-gray-300 rounded-full font-medium transition-colors">
+                        戻る
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Order Form Section -->
+    <section class="pt-24 pb-20 bg-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Page Title -->
+            <div class="text-center mb-16">
+                <h2 class="text-5xl font-cursive text-gold font-normal tracking-wide mb-4">Ordermade Candle</h2>
+                <p class="text-gray-700 text-base font-light leading-relaxed">
+                    あなただけの特別なキャンドルをお作りいたします
+                </p>
+            </div>
+
+            <form id="orderForm" class="space-y-12">
+                <!-- 花の色 -->
+                <div class="space-y-6">
+                    <h3 class="text-xl font-medium text-gray-900 mb-4">花の色</h3>
+                    <p class="text-gray-700 text-sm font-light leading-relaxed mb-4">
+                        キャンドルに使用するお花の色をお選びください（複数選択可能）
+                    </p>
+                    <p class="text-gray-600 text-xs font-light leading-relaxed mb-6">
+                        ※ 2～3色がおすすめです
+                    </p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                        <label class="cursor-pointer">
+                            <input type="checkbox" name="flower_color" value="white" class="sr-only peer">
+                            <div class="p-4 border-2 border-gray-200 rounded-lg text-center peer-checked:border-gold peer-checked:bg-gold peer-checked:bg-opacity-10 transition-all">
+                                <div class="w-8 h-8 bg-white border-2 border-gray-300 rounded-full mx-auto mb-2"></div>
+                                <span class="text-sm font-light">ホワイト</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" name="flower_color" value="pink" class="sr-only peer">
+                            <div class="p-4 border-2 border-gray-200 rounded-lg text-center peer-checked:border-gold peer-checked:bg-gold peer-checked:bg-opacity-10 transition-all">
+                                <div class="w-8 h-8 bg-pink-300 rounded-full mx-auto mb-2"></div>
+                                <span class="text-sm font-light">ピンク</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" name="flower_color" value="purple" class="sr-only peer">
+                            <div class="p-4 border-2 border-gray-200 rounded-lg text-center peer-checked:border-gold peer-checked:bg-gold peer-checked:bg-opacity-10 transition-all">
+                                <div class="w-8 h-8 bg-purple-300 rounded-full mx-auto mb-2"></div>
+                                <span class="text-sm font-light">パープル</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" name="flower_color" value="blue" class="sr-only peer">
+                            <div class="p-4 border-2 border-gray-200 rounded-lg text-center peer-checked:border-gold peer-checked:bg-gold peer-checked:bg-opacity-10 transition-all">
+                                <div class="w-8 h-8 bg-blue-300 rounded-full mx-auto mb-2"></div>
+                                <span class="text-sm font-light">ブルー</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" name="flower_color" value="red" class="sr-only peer">
+                            <div class="p-4 border-2 border-gray-200 rounded-lg text-center peer-checked:border-gold peer-checked:bg-gold peer-checked:bg-opacity-10 transition-all">
+                                <div class="w-8 h-8 bg-red-300 rounded-full mx-auto mb-2"></div>
+                                <span class="text-sm font-light">レッド</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" name="flower_color" value="yellow" class="sr-only peer">
+                            <div class="p-4 border-2 border-gray-200 rounded-lg text-center peer-checked:border-gold peer-checked:bg-gold peer-checked:bg-opacity-10 transition-all">
+                                <div class="w-8 h-8 bg-yellow-300 rounded-full mx-auto mb-2"></div>
+                                <span class="text-sm font-light">イエロー</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" name="flower_color" value="orange" class="sr-only peer">
+                            <div class="p-4 border-2 border-gray-200 rounded-lg text-center peer-checked:border-gold peer-checked:bg-gold peer-checked:bg-opacity-10 transition-all">
+                                <div class="w-8 h-8 bg-orange-300 rounded-full mx-auto mb-2"></div>
+                                <span class="text-sm font-light">オレンジ</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" name="flower_color" value="green" class="sr-only peer">
+                            <div class="p-4 border-2 border-gray-200 rounded-lg text-center peer-checked:border-gold peer-checked:bg-gold peer-checked:bg-opacity-10 transition-all">
+                                <div class="w-8 h-8 bg-green-300 rounded-full mx-auto mb-2"></div>
+                                <span class="text-sm font-light">グリーン</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" name="flower_color" value="lavender" class="sr-only peer">
+                            <div class="p-4 border-2 border-gray-200 rounded-lg text-center peer-checked:border-gold peer-checked:bg-gold peer-checked:bg-opacity-10 transition-all">
+                                <div class="w-8 h-8 bg-purple-200 rounded-full mx-auto mb-2"></div>
+                                <span class="text-sm font-light">ラベンダー</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" name="flower_color" value="gold" class="sr-only peer">
+                            <div class="p-4 border-2 border-gray-200 rounded-lg text-center peer-checked:border-gold peer-checked:bg-gold peer-checked:bg-opacity-10 transition-all">
+                                <div class="w-8 h-8 bg-yellow-400 border-2 border-yellow-500 rounded-full mx-auto mb-2"></div>
+                                <span class="text-sm font-light">ゴールド</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" name="flower_color" value="silver" class="sr-only peer">
+                            <div class="p-4 border-2 border-gray-200 rounded-lg text-center peer-checked:border-gold peer-checked:bg-gold peer-checked:bg-opacity-10 transition-all">
+                                <div class="w-8 h-8 bg-gray-300 border-2 border-gray-400 rounded-full mx-auto mb-2"></div>
+                                <span class="text-sm font-light">シルバー</span>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="checkbox" name="flower_color" value="black" class="sr-only peer">
+                            <div class="p-4 border-2 border-gray-200 rounded-lg text-center peer-checked:border-gold peer-checked:bg-gold peer-checked:bg-opacity-10 transition-all">
+                                <div class="w-8 h-8 bg-gray-900 border-2 border-gray-700 rounded-full mx-auto mb-2"></div>
+                                <span class="text-sm font-light">ブラック</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 香り -->
+                <div class="space-y-6">
+                    <h3 class="text-xl font-medium text-gray-900 mb-4">香り</h3>
+                    <p class="text-gray-700 text-sm font-light leading-relaxed mb-6">
+                        どのような香りがお好みか、イメージをお聞かせください
+                    </p>
+                    <textarea name="fragrance" rows="4" 
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent font-light"
+                              placeholder="例：ラベンダーのような落ち着く香り、柑橘系の爽やかな香り、バニラのような甘い香り など"
+                              required></textarea>
+                </div>
+
+                <!-- 芯の種類 -->
+                <div class="space-y-6">
+                    <h3 class="text-xl font-medium text-gray-900 mb-4">芯の種類</h3>
+                    <p class="text-gray-700 text-sm font-light leading-relaxed mb-6">
+                        キャンドルの芯の種類をお選びください
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="wick_type" value="cotton" class="sr-only peer" required>
+                            <div class="p-6 border-2 border-gray-200 rounded-lg peer-checked:border-gold peer-checked:bg-gold peer-checked:bg-opacity-10 transition-all">
+                                <h4 class="text-lg font-medium text-gray-900 mb-2">糸芯</h4>
+                                <p class="text-gray-700 text-sm font-light leading-relaxed">
+                                    火の揺らぎが楽しめる<br>
+                                    優しく穏やかな炎で、リラックスタイムに最適です
+                                </p>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="wick_type" value="wood" class="sr-only peer">
+                            <div class="p-6 border-2 border-gray-200 rounded-lg peer-checked:border-gold peer-checked:bg-gold peer-checked:bg-opacity-10 transition-all">
+                                <h4 class="text-lg font-medium text-gray-900 mb-2">木芯</h4>
+                                <p class="text-gray-700 text-sm font-light leading-relaxed">
+                                    焚き火のような音と雰囲気を楽しめる<br>
+                                    パチパチという音が心地よい癒しの時間を演出します
+                                </p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- お客様情報 -->
+                <div class="space-y-6 pt-8 border-t border-gray-200">
+                    <h3 class="text-xl font-medium text-gray-900 mb-4">お客様情報</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-gray-700 text-sm font-medium mb-2">お名前 *</label>
+                            <input type="text" name="customer_name" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent font-light" 
+                                   required>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-sm font-medium mb-2">メールアドレス *</label>
+                            <input type="email" name="customer_email" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent font-light" 
+                                   required>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 text-sm font-medium mb-2">電話番号</label>
+                        <input type="tel" name="customer_phone" 
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent font-light">
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 text-sm font-medium mb-2">ご要望・備考</label>
+                        <textarea name="notes" rows="3" 
+                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gold focus:border-transparent font-light"
+                                  placeholder="その他ご要望やご質問がございましたらお聞かせください"></textarea>
+                    </div>
+                </div>
+
+                <!-- 価格表示 -->
+                <div class="bg-french-gray rounded-lg p-6 text-center">
+                    <p class="text-gray-700 text-sm font-light mb-2">オーダーメイドボタニカルキャンドル</p>
+                    <p class="text-gold font-medium text-3xl">¥6,500</p>
+                    <p class="text-gray-600 text-xs font-light mt-2">（税込・送料込）</p>
+                </div>
+
+                <!-- 注文ボタン -->
+                <div class="text-center pt-8">
+                    <button type="submit" 
+                            class="bg-gold text-white px-12 py-4 rounded-full font-medium hover:bg-yellow-600 transition-colors text-lg">
+                        ご注文を確定する
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h5 class="text-3xl font-cursive text-gold mb-4 font-normal tracking-wide">Amure</h5>
+                    <p class="text-gray-400 text-sm">手の届くフランスエレガンス</p>
+                </div>
+                
+                <div>
+                    <h6 class="font-medium mb-4">ナビゲーション</h6>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="index.html" class="hover:text-gold transition-colors">Home</a></li>
+                        <li><a href="index.html#products" class="hover:text-gold transition-colors">Collection</a></li>
+                        <li><a href="index.html#about" class="hover:text-gold transition-colors">About</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <div class="flex justify-end">
+                        <a href="https://www.instagram.com/_____candle.108?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" class="text-gray-400 hover:text-gold transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+                <p class="text-gray-400 text-sm">&copy; 2024 Amure. 全著作権所有。</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // EmailJS configuration
+        const EMAILJS_CONFIG = {
+            serviceId: 'service_yvcr9ws',
+            customerTemplateId: 'customer_confirmation',
+            adminTemplateId: 'admin_notification',
+            publicKey: 'WSxvv6s7oGcckOb6R'
+        };
+
+        // Initialize EmailJS
+        (function() {
+            emailjs.init(EMAILJS_CONFIG.publicKey);
+        })();
+
+        // Order form submission
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(this);
+            const orderData = {};
+            
+            // Handle multiple checkbox values for flower colors
+            const flowerColors = [];
+            const checkboxes = document.querySelectorAll('input[name="flower_color"]:checked');
+            checkboxes.forEach(checkbox => {
+                // Get Japanese color name from label
+                const label = checkbox.closest('label').querySelector('span').textContent;
+                flowerColors.push(label);
+            });
+            
+            // Validate at least one color is selected
+            if (flowerColors.length === 0) {
+                alert('花の色を1つ以上選択してください。');
+                return;
+            }
+            
+            // Get other form data
+            for (let [key, value] of formData.entries()) {
+                if (key !== 'flower_color') {
+                    orderData[key] = value;
+                }
+            }
+            
+            // Prepare email template parameters
+            const templateParams = {
+                customer_name: orderData.customer_name || '',
+                customer_email: orderData.customer_email || '',
+                customer_phone: orderData.customer_phone || '',
+                flower_colors: flowerColors.join('、'),
+                fragrance: orderData.fragrance || '',
+                wick_type: orderData.wick_type === 'cotton' ? '糸芯' : '木芯',
+                notes: orderData.notes || 'なし'
+            };
+            
+            // Show loading state
+            const submitBtn = document.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = '送信中...';
+            submitBtn.disabled = true;
+            
+            // Send both emails via EmailJS
+            console.log('Sending emails with config:', EMAILJS_CONFIG);
+            console.log('Template params:', templateParams);
+            
+            // Send customer email first
+            emailjs.send(
+                EMAILJS_CONFIG.serviceId,
+                EMAILJS_CONFIG.customerTemplateId,
+                templateParams
+            ).then(function(customerResponse) {
+                console.log('Customer email sent successfully:', customerResponse);
+                
+                // Then send admin email
+                return emailjs.send(
+                    EMAILJS_CONFIG.serviceId,
+                    EMAILJS_CONFIG.adminTemplateId,
+                    templateParams
+                );
+            }).then(function(adminResponse) {
+                console.log('Admin email sent successfully:', adminResponse);
+                alert('ご注文を受け付けました！\n確認メールをお送りいたしました。\n\nありがとうございます！');
+                
+                // Reset form
+                document.getElementById('orderForm').reset();
+                
+                // Reset button
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                
+            }).catch(function(error) {
+                console.error('Email send failed:', error);
+                console.error('Error details:', error.text, error.status);
+                alert('申し訳ございません。送信に失敗しました。\nエラー詳細: ' + (error.text || error.message || 'Unknown error') + '\nTemplate ID確認: customer=' + EMAILJS_CONFIG.customerTemplateId + ', admin=' + EMAILJS_CONFIG.adminTemplateId + '\nしばらく時間をおいて再度お試しください。');
+                
+                // Reset button
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>
