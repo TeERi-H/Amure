@@ -333,6 +333,11 @@
             publicKey: 'WSxvv6s7oGcckOb6R'
         };
 
+        // Google Sheets configuration
+        const SHEETS_CONFIG = {
+            webAppUrl: 'https://script.google.com/macros/s/AKfycbxkxRgeJKnQ_JL37KTE1w9yhWfZj7Vfa8hn0tjT6oK_lWBmGc4GnfDA78Yy3LpAwsyN/exec'
+        };
+
         // Initialize EmailJS
         (function() {
             emailjs.init(EMAILJS_CONFIG.publicKey);
@@ -385,16 +390,28 @@
             submitBtn.textContent = '送信中...';
             submitBtn.disabled = true;
             
-            // Send both emails via EmailJS
-            console.log('Sending emails with config:', EMAILJS_CONFIG);
-            console.log('Template params:', templateParams);
+            // Send data to Google Sheets and emails
+            console.log('Sending to Google Sheets and emails:', templateParams);
             
-            // Send customer email first
-            emailjs.send(
-                EMAILJS_CONFIG.serviceId,
-                EMAILJS_CONFIG.customerTemplateId,
-                templateParams
-            ).then(function(customerResponse) {
+            // Send to Google Sheets first
+            fetch(SHEETS_CONFIG.webAppUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(templateParams)
+            }).then(function(response) {
+                return response.json();
+            }).then(function(sheetsResult) {
+                console.log('Google Sheets result:', sheetsResult);
+                
+                // Then send customer email
+                return emailjs.send(
+                    EMAILJS_CONFIG.serviceId,
+                    EMAILJS_CONFIG.customerTemplateId,
+                    templateParams
+                );
+            }).then(function(customerResponse) {
                 console.log('Customer email sent successfully:', customerResponse);
                 
                 // Then send admin email
@@ -405,7 +422,7 @@
                 );
             }).then(function(adminResponse) {
                 console.log('Admin email sent successfully:', adminResponse);
-                alert('ご注文を受け付けました！\n確認メールをお送りいたしました。\n\nありがとうございます！');
+                alert('ご注文を受け付けました！\n確認メールをお送りいたしました。\n注文データも保存されました。\n\nありがとうございます！');
                 
                 // Reset form
                 document.getElementById('orderForm').reset();
@@ -415,9 +432,8 @@
                 submitBtn.disabled = false;
                 
             }).catch(function(error) {
-                console.error('Email send failed:', error);
-                console.error('Error details:', error.text, error.status);
-                alert('申し訳ございません。送信に失敗しました。\nエラー詳細: ' + (error.text || error.message || 'Unknown error') + '\nTemplate ID確認: customer=' + EMAILJS_CONFIG.customerTemplateId + ', admin=' + EMAILJS_CONFIG.adminTemplateId + '\nしばらく時間をおいて再度お試しください。');
+                console.error('Process failed:', error);
+                alert('申し訳ございません。処理に失敗しました。\nしばらく時間をおいて再度お試しください。\n\nエラー詳細: ' + (error.message || error.toString()));
                 
                 // Reset button
                 submitBtn.textContent = originalText;
