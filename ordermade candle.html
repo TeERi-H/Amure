@@ -396,14 +396,14 @@
             // Send to Google Sheets first
             fetch(SHEETS_CONFIG.webAppUrl, {
                 method: 'POST',
+                mode: 'no-cors',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: JSON.stringify(templateParams)
+                body: new URLSearchParams(templateParams)
             }).then(function(response) {
-                return response.json();
-            }).then(function(sheetsResult) {
-                console.log('Google Sheets result:', sheetsResult);
+                console.log('Google Sheets response received');
+                // Note: no-cors mode doesn't allow reading response, so we assume success
                 
                 // Then send customer email
                 return emailjs.send(
