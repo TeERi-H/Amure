@@ -393,17 +393,20 @@
             // Send data to Google Sheets and emails
             console.log('Sending to Google Sheets and emails:', templateParams);
             
-            // Send to Google Sheets first
+            // Send to Google Sheets first using form submission method
+            const form = new FormData();
+            Object.keys(templateParams).forEach(key => {
+                form.append(key, templateParams[key]);
+            });
+            
             fetch(SHEETS_CONFIG.webAppUrl, {
                 method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams(templateParams)
+                body: form
             }).then(function(response) {
-                console.log('Google Sheets response received');
-                // Note: no-cors mode doesn't allow reading response, so we assume success
+                console.log('Google Sheets response received:', response);
+                return response.text();
+            }).then(function(sheetsResult) {
+                console.log('Google Sheets result:', sheetsResult);
                 
                 // Then send customer email
                 return emailjs.send(
