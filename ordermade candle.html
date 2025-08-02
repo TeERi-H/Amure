@@ -394,19 +394,29 @@
             console.log('Sending to Google Sheets and emails:', templateParams);
             
             // Send to Google Sheets first using form submission method
+            console.log('Preparing to send data to Google Sheets:', templateParams);
+            console.log('Google Sheets URL:', SHEETS_CONFIG.webAppUrl);
+            
             const form = new FormData();
             Object.keys(templateParams).forEach(key => {
                 form.append(key, templateParams[key]);
+                console.log('Added to form:', key, '=', templateParams[key]);
             });
             
             fetch(SHEETS_CONFIG.webAppUrl, {
                 method: 'POST',
                 body: form
             }).then(function(response) {
-                console.log('Google Sheets response received:', response);
+                console.log('Google Sheets response status:', response.status);
+                console.log('Google Sheets response headers:', response.headers);
                 return response.text();
             }).then(function(sheetsResult) {
-                console.log('Google Sheets result:', sheetsResult);
+                console.log('Google Sheets result text:', sheetsResult);
+                
+                if (sheetsResult.includes('ERROR')) {
+                    console.error('Google Sheets returned error:', sheetsResult);
+                    alert('Google Sheetsへの保存でエラーが発生しました: ' + sheetsResult);
+                }
                 
                 // Then send customer email
                 return emailjs.send(
