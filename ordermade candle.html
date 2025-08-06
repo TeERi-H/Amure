@@ -346,7 +346,9 @@
         };
 
         // Initialize Stripe
+        console.log('Initializing Stripe with key:', STRIPE_CONFIG.publicKey);
         const stripe = Stripe(STRIPE_CONFIG.publicKey);
+        console.log('Stripe initialized:', stripe);
 
         // Initialize EmailJS
         (function() {
@@ -446,7 +448,7 @@
         }
 
         // Stripe Checkout handler
-        document.getElementById('checkoutButton').addEventListener('click', function() {
+        document.getElementById('checkoutButton').addEventListener('click', async function() {
             // Validate form data
             const orderData = validateAndPrepareOrder();
             if (!orderData) return;
@@ -457,40 +459,50 @@
             checkoutBtn.textContent = '決済画面を開いています...';
             checkoutBtn.disabled = true;
             
-            // Store order data for later use
-            sessionStorage.setItem('orderData', JSON.stringify(orderData));
-            
-            // Create Stripe Checkout Session
-            stripe.redirectToCheckout({
-                mode: 'payment',
-                lineItems: [{
-                    price_data: {
-                        currency: 'jpy',
-                        product_data: {
-                            name: 'Amure オーダーメイドボタニカルキャンドル',
-                            description: `花の色: ${orderData.flower_colors}\n香り: ${orderData.fragrance}\n芯: ${orderData.wick_type}`,
-                            images: ['https://teeeri-h.github.io/Amure/product-image.jpg']
+            try {
+                // Store order data for later use
+                sessionStorage.setItem('orderData', JSON.stringify(orderData));
+                
+                console.log('Creating checkout session with order data:', orderData);
+                
+                // Create Stripe Checkout Session using Stripe Payment Links approach
+                const { error } = await stripe.redirectToCheckout({
+                    mode: 'payment',
+                    lineItems: [{
+                        price_data: {
+                            currency: 'jpy',
+                            product_data: {
+                                name: 'Amure オーダーメイドボタニカルキャンドル',
+                                description: `花の色: ${orderData.flower_colors} / 香り: ${orderData.fragrance} / 芯: ${orderData.wick_type}`,
+                                images: ['https://endearing-twilight-4d062d.netlify.app/product-image.jpg']
+                            },
+                            unit_amount: 6500
                         },
-                        unit_amount: 6500
-                    },
-                    quantity: 1
-                }],
-                success_url: window.location.origin + window.location.pathname + '?success=true',
-                cancel_url: window.location.origin + window.location.pathname + '?canceled=true',
-                customer_email: orderData.customer_email,
-                metadata: {
-                    customer_name: orderData.customer_name,
-                    flower_colors: orderData.flower_colors,
-                    fragrance: orderData.fragrance,
-                    wick_type: orderData.wick_type
-                }
-            }).then(function(result) {
-                if (result.error) {
-                    alert('決済エラー: ' + result.error.message);
+                        quantity: 1
+                    }],
+                    success_url: window.location.href + '?success=true',
+                    cancel_url: window.location.href + '?canceled=true',
+                    customer_email: orderData.customer_email,
+                    metadata: {
+                        customer_name: orderData.customer_name,
+                        flower_colors: orderData.flower_colors,
+                        fragrance: orderData.fragrance,
+                        wick_type: orderData.wick_type
+                    }
+                });
+
+                if (error) {
+                    console.error('Stripe error:', error);
+                    alert('決済エラー: ' + error.message);
                     checkoutBtn.textContent = originalText;
                     checkoutBtn.disabled = false;
                 }
-            });
+            } catch (e) {
+                console.error('Checkout error:', e);
+                alert('決済処理でエラーが発生しました: ' + e.message);
+                checkoutBtn.textContent = originalText;
+                checkoutBtn.disabled = false;
+            }
         });
 
         // Handle payment success/cancel on page load
