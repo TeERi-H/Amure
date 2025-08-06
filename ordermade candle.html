@@ -28,6 +28,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- EmailJS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <!-- Stripe -->
+    <script src="https://js.stripe.com/v3/"></script>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Great+Vibes&family=Allura&family=Alex+Brush&family=Kaushan+Script&family=Satisfy&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         /* Beautiful script font for brand text */
@@ -280,9 +282,9 @@
 
                 <!-- 注文ボタン -->
                 <div class="text-center pt-8">
-                    <button type="submit" 
+                    <button type="button" id="checkoutButton"
                             class="bg-gold text-white px-12 py-4 rounded-full font-medium hover:bg-yellow-600 transition-colors text-lg">
-                        ご注文を確定する
+                        決済に進む
                     </button>
                 </div>
             </form>
@@ -325,6 +327,11 @@
     </footer>
 
     <script>
+        // Stripe configuration
+        const STRIPE_CONFIG = {
+            publicKey: 'pk_test_51Rt4SZAi5aleDtmDcyo8bSIG3NffUatxVy9pKXDMB1g6U4L4jtMXNxS7md0psizaVmFVPBOkjsL9ysSdzQ1vAJNV00CNUWk1wj'
+        };
+
         // EmailJS configuration
         const EMAILJS_CONFIG = {
             serviceId: 'service_yvcr9ws',
@@ -338,17 +345,17 @@
             webAppUrl: 'https://script.google.com/macros/s/AKfycbzUe3t-lbOAT6_ww7qltC8Tprnf0R7csP8Y76_1d4qCAzw3bTMLtgtZqJ6kQDmy1oFROQ/exec'
         };
 
+        // Initialize Stripe
+        const stripe = Stripe(STRIPE_CONFIG.publicKey);
+
         // Initialize EmailJS
         (function() {
             emailjs.init(EMAILJS_CONFIG.publicKey);
         })();
 
-        // Order form submission
-        document.getElementById('orderForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Get form data
-            const formData = new FormData(this);
+        // Validate and prepare order data
+        function validateAndPrepareOrder() {
+            const formData = new FormData(document.getElementById('orderForm'));
             const orderData = {};
             
             // Handle multiple checkbox values for flower colors
@@ -363,7 +370,13 @@
             // Validate at least one color is selected
             if (flowerColors.length === 0) {
                 alert('花の色を1つ以上選択してください。');
-                return;
+                return null;
+            }
+            
+            // Validate required fields
+            if (!formData.get('customer_name') || !formData.get('customer_email') || !formData.get('fragrance') || !formData.get('wick_type')) {
+                alert('必須項目をすべて入力してください。');
+                return null;
             }
             
             // Get other form data
@@ -373,7 +386,7 @@
                 }
             }
             
-            // Prepare email template parameters
+            // Prepare template parameters
             const templateParams = {
                 customer_name: orderData.customer_name || '',
                 customer_email: orderData.customer_email || '',
@@ -384,74 +397,123 @@
                 notes: orderData.notes || 'なし'
             };
             
-            // Show loading state
-            const submitBtn = document.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = '送信中...';
-            submitBtn.disabled = true;
+            return templateParams;
+        }
+
+        // Handle successful payment and process order
+        function handlePaymentSuccess(sessionId, orderData) {
+            console.log('Payment successful, processing order:', orderData);
             
-            // Send data to Google Sheets and emails
-            console.log('Sending to Google Sheets and emails:', templateParams);
+            // Send to Google Sheets
+            const params = new URLSearchParams(orderData);
+            const urlWithParams = SHEETS_CONFIG.webAppUrl + '?' + params.toString();
             
-            // Send to Google Sheets first using form submission method
-            console.log('Preparing to send data to Google Sheets:', templateParams);
-            console.log('Google Sheets URL:', SHEETS_CONFIG.webAppUrl);
-            
-            const form = new FormData();
-            Object.keys(templateParams).forEach(key => {
-                form.append(key, templateParams[key]);
-                console.log('Added to form:', key, '=', templateParams[key]);
-            });
-            
-            fetch(SHEETS_CONFIG.webAppUrl, {
-                method: 'POST',
-                body: form
+            return fetch(urlWithParams, {
+                method: 'GET'
             }).then(function(response) {
-                console.log('Google Sheets response status:', response.status);
-                console.log('Google Sheets response headers:', response.headers);
                 return response.text();
             }).then(function(sheetsResult) {
-                console.log('Google Sheets result text:', sheetsResult);
+                console.log('Google Sheets result:', sheetsResult);
                 
-                if (sheetsResult.includes('ERROR')) {
-                    console.error('Google Sheets returned error:', sheetsResult);
-                    alert('Google Sheetsへの保存でエラーが発生しました: ' + sheetsResult);
-                }
-                
-                // Then send customer email
+                // Send customer email
                 return emailjs.send(
                     EMAILJS_CONFIG.serviceId,
                     EMAILJS_CONFIG.customerTemplateId,
-                    templateParams
+                    orderData
                 );
             }).then(function(customerResponse) {
-                console.log('Customer email sent successfully:', customerResponse);
+                console.log('Customer email sent:', customerResponse);
                 
-                // Then send admin email
+                // Send admin email
                 return emailjs.send(
                     EMAILJS_CONFIG.serviceId,
                     EMAILJS_CONFIG.adminTemplateId,
-                    templateParams
+                    orderData
                 );
             }).then(function(adminResponse) {
-                console.log('Admin email sent successfully:', adminResponse);
-                alert('ご注文を受け付けました！\n確認メールをお送りいたしました。\n注文データも保存されました。\n\nありがとうございます！');
+                console.log('Admin email sent:', adminResponse);
+                
+                // Show success message
+                alert('ご注文とお支払いが完了しました！\n確認メールをお送りいたしました。\n\nありがとうございます！');
                 
                 // Reset form
                 document.getElementById('orderForm').reset();
                 
-                // Reset button
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-                
             }).catch(function(error) {
-                console.error('Process failed:', error);
-                alert('申し訳ございません。処理に失敗しました。\nしばらく時間をおいて再度お試しください。\n\nエラー詳細: ' + (error.message || error.toString()));
-                
-                // Reset button
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
+                console.error('Post-payment processing failed:', error);
+                alert('お支払いは完了しましたが、データ処理でエラーが発生しました。\nお手数ですが直接お問い合わせください。');
             });
+        }
+
+        // Stripe Checkout handler
+        document.getElementById('checkoutButton').addEventListener('click', function() {
+            // Validate form data
+            const orderData = validateAndPrepareOrder();
+            if (!orderData) return;
+            
+            // Show loading state
+            const checkoutBtn = document.getElementById('checkoutButton');
+            const originalText = checkoutBtn.textContent;
+            checkoutBtn.textContent = '決済画面を開いています...';
+            checkoutBtn.disabled = true;
+            
+            // Store order data for later use
+            sessionStorage.setItem('orderData', JSON.stringify(orderData));
+            
+            // Create Stripe Checkout Session
+            stripe.redirectToCheckout({
+                mode: 'payment',
+                lineItems: [{
+                    price_data: {
+                        currency: 'jpy',
+                        product_data: {
+                            name: 'Amure オーダーメイドボタニカルキャンドル',
+                            description: `花の色: ${orderData.flower_colors}\n香り: ${orderData.fragrance}\n芯: ${orderData.wick_type}`,
+                            images: ['https://teeeri-h.github.io/Amure/product-image.jpg']
+                        },
+                        unit_amount: 6500
+                    },
+                    quantity: 1
+                }],
+                success_url: window.location.origin + window.location.pathname + '?success=true',
+                cancel_url: window.location.origin + window.location.pathname + '?canceled=true',
+                customer_email: orderData.customer_email,
+                metadata: {
+                    customer_name: orderData.customer_name,
+                    flower_colors: orderData.flower_colors,
+                    fragrance: orderData.fragrance,
+                    wick_type: orderData.wick_type
+                }
+            }).then(function(result) {
+                if (result.error) {
+                    alert('決済エラー: ' + result.error.message);
+                    checkoutBtn.textContent = originalText;
+                    checkoutBtn.disabled = false;
+                }
+            });
+        });
+
+        // Handle payment success/cancel on page load
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            if (urlParams.get('success') === 'true') {
+                // Payment successful
+                const orderData = JSON.parse(sessionStorage.getItem('orderData') || '{}');
+                if (orderData.customer_name) {
+                    handlePaymentSuccess(null, orderData);
+                    sessionStorage.removeItem('orderData');
+                }
+                
+                // Clean URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            } else if (urlParams.get('canceled') === 'true') {
+                // Payment canceled
+                alert('お支払いがキャンセルされました。');
+                
+                // Clean URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
         });
     </script>
 </body>
