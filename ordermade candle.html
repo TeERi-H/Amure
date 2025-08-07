@@ -460,11 +460,16 @@
             }).then(function(adminResponse) {
                 console.log('Admin email sent:', adminResponse);
                 
-                // Show success message
-                alert('ご注文が完了しました！\n確認メールをお送りいたしました。\nデータも保存されました。\n\nありがとうございます！');
+                // Don't show alert if we're redirecting to thank you page
+                if (!window.location.href.includes('thank-you.html')) {
+                    // Show success message only if not on thank you page
+                    console.log('Order processing completed successfully');
+                }
                 
                 // Reset form
-                document.getElementById('orderForm').reset();
+                if (document.getElementById('orderForm')) {
+                    document.getElementById('orderForm').reset();
+                }
                 
             }).catch(function(error) {
                 console.error('Post-payment processing failed:', error);
@@ -543,16 +548,22 @@
                 // User returned from Stripe - ask if payment was successful
                 const paymentSuccess = confirm(
                     'Stripeでの決済は完了しましたか？\n\n' +
-                    '「OK」= 決済完了（注文処理を実行します）\n' +
+                    '「OK」= 決済完了（サンクスページに移動します）\n' +
                     '「キャンセル」= 決済未完了'
                 );
                 
                 if (paymentSuccess) {
-                    // Process the order
+                    // Process the order and redirect to thank you page
                     const orderData = JSON.parse(pendingOrder);
                     console.log('Processing completed order:', orderData);
+                    
+                    // Process order in background and redirect immediately
                     handlePaymentSuccess(null, orderData);
-                    sessionStorage.removeItem('pendingOrder');
+                    
+                    // Redirect to thank you page
+                    setTimeout(() => {
+                        window.location.href = 'thank-you.html';
+                    }, 1000);
                 } else {
                     // Payment was not completed
                     alert('決済が完了していない場合は、再度お試しください。');
