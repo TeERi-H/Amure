@@ -26,6 +26,8 @@
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="./amure-logo.jpg">
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- EmailJS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Great+Vibes&family=Allura&family=Alex+Brush&family=Kaushan+Script&family=Satisfy&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         /* Beautiful script font for brand text */
@@ -201,7 +203,9 @@
 
         // Initialize EmailJS
         (function() {
+            console.log('Initializing EmailJS with public key:', EMAILJS_CONFIG.publicKey);
             emailjs.init(EMAILJS_CONFIG.publicKey);
+            console.log('EmailJS initialized successfully');
         })();
 
         // Process pending order if available
@@ -210,11 +214,39 @@
             const orderData = JSON.parse(pendingOrder);
             console.log('Processing order from thank you page:', orderData);
             
+            // Show processing indicator
+            showProcessingStatus('注文データを処理しています...');
+            
             // Process the order (Google Sheets + Emails)
             processOrder(orderData);
             
             // Remove from session storage
             sessionStorage.removeItem('pendingOrder');
+        } else {
+            console.log('No pending order found');
+        }
+
+        // Add visual status indicator
+        function showProcessingStatus(message) {
+            const statusDiv = document.createElement('div');
+            statusDiv.id = 'processingStatus';
+            statusDiv.className = 'fixed top-4 right-4 bg-gold text-white px-4 py-2 rounded-lg text-sm';
+            statusDiv.textContent = message;
+            document.body.appendChild(statusDiv);
+        }
+
+        function updateProcessingStatus(message) {
+            const statusDiv = document.getElementById('processingStatus');
+            if (statusDiv) {
+                statusDiv.textContent = message;
+            }
+        }
+
+        function hideProcessingStatus() {
+            const statusDiv = document.getElementById('processingStatus');
+            if (statusDiv) {
+                statusDiv.remove();
+            }
         }
 
         // Process order function (same as in order page)
@@ -252,28 +284,42 @@
             // Try both methods
             Promise.allSettled([postPromise, getPromise]).then(function(results) {
                 console.log('Google Sheets submission results:', results);
+                updateProcessingStatus('Google Sheets保存完了。メール送信中...');
                 
                 // Send customer email
+                console.log('Sending customer email with data:', orderData);
                 return emailjs.send(
                     EMAILJS_CONFIG.serviceId,
                     EMAILJS_CONFIG.customerTemplateId,
                     orderData
                 );
             }).then(function(customerResponse) {
-                console.log('Customer email sent:', customerResponse);
+                console.log('Customer email sent successfully:', customerResponse);
+                updateProcessingStatus('お客様メール送信完了。管理者メール送信中...');
                 
                 // Send admin email
+                console.log('Sending admin email with data:', orderData);
                 return emailjs.send(
                     EMAILJS_CONFIG.serviceId,
                     EMAILJS_CONFIG.adminTemplateId,
                     orderData
                 );
             }).then(function(adminResponse) {
-                console.log('Admin email sent:', adminResponse);
+                console.log('Admin email sent successfully:', adminResponse);
+                updateProcessingStatus('注文処理完了！');
                 console.log('Order processing completed successfully on thank you page');
+                
+                // Hide status after 3 seconds
+                setTimeout(() => {
+                    hideProcessingStatus();
+                }, 3000);
                 
             }).catch(function(error) {
                 console.error('Post-payment processing failed on thank you page:', error);
+                updateProcessingStatus('エラー: ' + error.message);
+                
+                // Show error details
+                alert('処理中にエラーが発生しました:\n' + error.message + '\n\nコンソールで詳細を確認してください。');
             });
         }
 
