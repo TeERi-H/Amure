@@ -495,10 +495,10 @@
                 
                 console.log('Creating checkout session with order data:', orderData);
                 
-                // Use Stripe Elements for embedded payment form
-                // For frontend-only solution, let's use embedded Stripe Elements
+                // Use actual Stripe Payment Link
+                console.log('Redirecting to Stripe checkout with order data:', orderData);
                 
-                // For now, show order details and simulate payment success
+                // Show order details before redirecting
                 const confirmed = confirm(
                     `ご注文内容を確認してください:\n\n` +
                     `商品: オーダーメイドボタニカルキャンドル\n` +
@@ -508,18 +508,18 @@
                     `芯: ${orderData.wick_type}\n` +
                     `お名前: ${orderData.customer_name}\n` +
                     `メール: ${orderData.customer_email}\n\n` +
-                    `この内容で注文を確定しますか？\n` +
-                    `(本番環境では実際の決済が行われます)`
+                    `Stripe決済ページに移動します。よろしいですか？`
                 );
                 
                 if (confirmed) {
-                    console.log('Order confirmed, processing...');
-                    checkoutBtn.textContent = '注文処理中...';
+                    // Store order data before redirect
+                    sessionStorage.setItem('pendingOrder', JSON.stringify(orderData));
                     
-                    // Simulate payment processing
-                    setTimeout(() => {
-                        handlePaymentSuccess(null, orderData);
-                    }, 2000);
+                    // Create payment URL with prefilled email
+                    const paymentUrl = `https://buy.stripe.com/test_14AeVc4L0bAt5SwezGgrS00?prefilled_email=${encodeURIComponent(orderData.customer_email)}`;
+                    
+                    // Redirect to Stripe payment page
+                    window.location.href = paymentUrl;
                 } else {
                     // Reset button
                     checkoutBtn.textContent = originalText;
@@ -534,12 +534,37 @@
             }
         });
 
-        // Handle payment success/cancel on page load
+        // Handle payment return from Stripe
         window.addEventListener('load', function() {
+            // Check if we have pending order data from before redirect
+            const pendingOrder = sessionStorage.getItem('pendingOrder');
+            
+            if (pendingOrder) {
+                // User returned from Stripe - ask if payment was successful
+                const paymentSuccess = confirm(
+                    'Stripeでの決済は完了しましたか？\n\n' +
+                    '「OK」= 決済完了（注文処理を実行します）\n' +
+                    '「キャンセル」= 決済未完了'
+                );
+                
+                if (paymentSuccess) {
+                    // Process the order
+                    const orderData = JSON.parse(pendingOrder);
+                    console.log('Processing completed order:', orderData);
+                    handlePaymentSuccess(null, orderData);
+                    sessionStorage.removeItem('pendingOrder');
+                } else {
+                    // Payment was not completed
+                    alert('決済が完了していない場合は、再度お試しください。');
+                    sessionStorage.removeItem('pendingOrder');
+                }
+            }
+            
+            // Handle URL parameters (legacy support)
             const urlParams = new URLSearchParams(window.location.search);
             
             if (urlParams.get('success') === 'true') {
-                // Payment successful
+                // Payment successful (legacy)
                 const orderData = JSON.parse(sessionStorage.getItem('orderData') || '{}');
                 if (orderData.customer_name) {
                     handlePaymentSuccess(null, orderData);
@@ -549,7 +574,7 @@
                 // Clean URL
                 window.history.replaceState({}, document.title, window.location.pathname);
             } else if (urlParams.get('canceled') === 'true') {
-                // Payment canceled
+                // Payment canceled (legacy)
                 alert('お支払いがキャンセルされました。');
                 
                 // Clean URL
