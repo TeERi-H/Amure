@@ -186,12 +186,95 @@
     </div>
 
     <script>
+        // EmailJS configuration
+        const EMAILJS_CONFIG = {
+            serviceId: 'service_yvcr9ws',
+            customerTemplateId: 'customer_confirmation',
+            adminTemplateId: 'admin_notification',
+            publicKey: 'WSxvv6s7oGcckOb6R'
+        };
+
+        // Google Sheets configuration
+        const SHEETS_CONFIG = {
+            webAppUrl: 'https://script.google.com/macros/s/AKfycbzUe3t-lbOAT6_ww7qltC8Tprnf0R7csP8Y76_1d4qCAzw3bTMLtgtZqJ6kQDmy1oFROQ/exec'
+        };
+
+        // Initialize EmailJS
+        (function() {
+            emailjs.init(EMAILJS_CONFIG.publicKey);
+        })();
+
         // Process pending order if available
         const pendingOrder = sessionStorage.getItem('pendingOrder');
         if (pendingOrder) {
-            console.log('Processing order from thank you page:', JSON.parse(pendingOrder));
-            // Here we could display order-specific details if needed
+            const orderData = JSON.parse(pendingOrder);
+            console.log('Processing order from thank you page:', orderData);
+            
+            // Process the order (Google Sheets + Emails)
+            processOrder(orderData);
+            
+            // Remove from session storage
             sessionStorage.removeItem('pendingOrder');
+        }
+
+        // Process order function (same as in order page)
+        function processOrder(orderData) {
+            console.log('Processing completed order on thank you page:', orderData);
+            
+            // Try multiple approaches for Google Sheets
+            const formData = new FormData();
+            Object.keys(orderData).forEach(key => {
+                formData.append(key, orderData[key]);
+            });
+            
+            const postPromise = fetch(SHEETS_CONFIG.webAppUrl, {
+                method: 'POST',
+                body: formData
+            }).catch(error => {
+                console.log('POST method failed:', error);
+                return null;
+            });
+            
+            const params = new URLSearchParams(orderData);
+            const urlWithParams = SHEETS_CONFIG.webAppUrl + '?' + params.toString();
+            
+            const getPromise = fetch(urlWithParams, {
+                method: 'GET',
+                mode: 'no-cors'
+            }).then(function(response) {
+                console.log('Google Sheets response (no-cors mode):', response);
+                return 'Success (no-cors mode)';
+            }).catch(error => {
+                console.log('GET method failed:', error);
+                return null;
+            });
+            
+            // Try both methods
+            Promise.allSettled([postPromise, getPromise]).then(function(results) {
+                console.log('Google Sheets submission results:', results);
+                
+                // Send customer email
+                return emailjs.send(
+                    EMAILJS_CONFIG.serviceId,
+                    EMAILJS_CONFIG.customerTemplateId,
+                    orderData
+                );
+            }).then(function(customerResponse) {
+                console.log('Customer email sent:', customerResponse);
+                
+                // Send admin email
+                return emailjs.send(
+                    EMAILJS_CONFIG.serviceId,
+                    EMAILJS_CONFIG.adminTemplateId,
+                    orderData
+                );
+            }).then(function(adminResponse) {
+                console.log('Admin email sent:', adminResponse);
+                console.log('Order processing completed successfully on thank you page');
+                
+            }).catch(function(error) {
+                console.error('Post-payment processing failed on thank you page:', error);
+            });
         }
 
         // Optional: Auto redirect to home after 30 seconds
