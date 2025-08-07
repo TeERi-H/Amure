@@ -329,7 +329,7 @@
     <script>
         // Stripe configuration
         const STRIPE_CONFIG = {
-            publicKey: 'pk_test_51Rt4SZAi5aleDtmDcyo8bSIG3NffUatxVy9pKXDMB1g6U4L4jtMXNxS7md0psizaVmFVPBOkjsL9ysSdzQ1vAJNV00CNUWk1wj'
+            publicKey: 'pk_test_51Rt4QbPCVH4wBSnWC2HF5Hj96yZNOi5n39zVVUPeKW6xjyDeCJ4v4xv46Me45SpTs4MdTyE8rsc32NNToqbljL6n003RSk9a8G'
         };
 
         // EmailJS configuration
@@ -521,7 +521,7 @@
                     sessionStorage.setItem('pendingOrder', JSON.stringify(orderData));
                     
                     // Create payment URL with prefilled email
-                    const paymentUrl = `https://buy.stripe.com/test_14AeVc4L0bAt5SwezGgrS00?prefilled_email=${encodeURIComponent(orderData.customer_email)}`;
+                    const paymentUrl = `https://buy.stripe.com/test_6oU5kF6LibKBbVB9583ZK00?prefilled_email=${encodeURIComponent(orderData.customer_email)}`;
                     
                     // Redirect to Stripe payment page
                     window.location.href = paymentUrl;
